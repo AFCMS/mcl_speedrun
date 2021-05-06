@@ -6,8 +6,8 @@ minetest.register_on_newplayer(function(player)
     meta:set_int("mcl_speedrun:playtime", 0)
     meta:set_int("mcl_speedrun:playtime_nether", 0)
     meta:set_int("mcl_speedrun:playtime_end", 0)
-    meta:set_bool("mcl_speedrun:is_nether", false)
-    meta:set_bool("mcl_speedrun:is_end", false)
+    meta:set("mcl_speedrun:is_nether", "false")
+    meta:set("mcl_speedrun:is_end", "false")
 end)
 
 minetest.register_on_joinplayer(function(player)
@@ -18,8 +18,8 @@ minetest.register_on_joinplayer(function(player)
         playtime = meta:get_int("mcl_speedrun:playtime"),
         playtime_nether = meta:get_int("mcl_speedrun:playtime_nether"),
         playtime_end = meta:get_int("mcl_speedrun:playtime_end"),
-        is_nether = meta:get_bool("mcl_speedrun:is_nether"),
-        is_end = meta:get_bool("mcl_speedrun:is_end"),
+        is_nether = meta:get("mcl_speedrun:is_nether"),
+        is_end = meta:get("mcl_speedrun:is_end"),
     }
     
     --os.time()
@@ -31,8 +31,8 @@ minetest.register_on_leaveplayer(function(player)
     meta:set_int("mcl_speedrun:playtime", current[name].playtime)
     meta:set_int("mcl_speedrun:playtime_nether", current[name].playtime_nether)
     meta:set_int("mcl_speedrun:playtime_end", current[name].playtime_end)
-    meta:set_bool("mcl_speedrun:is_nether", current[name].is_nether)
-    meta:set_bool("mcl_speedrun:is_end", current[name].is_end)
+    meta:set("mcl_speedrun:is_nether", current[name].is_nether)
+    meta:set("mcl_speedrun:is_end", current[name].is_end)
     current[name] = nil
 end)
 
