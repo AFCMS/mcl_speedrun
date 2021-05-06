@@ -14,7 +14,7 @@ minetest.register_on_joinplayer(function(player)
     local name = player:get_player_name()
     local meta = player:get_meta()
     current[name] = {
-        start = os.time()
+        start = os.time(),
         playtime = meta:get_int("mcl_speedrun:playtime"),
         playtime_nether = meta:get_int("mcl_speedrun:playtime_nether"),
         playtime_end = meta:get_int("mcl_speedrun:playtime_end"),
