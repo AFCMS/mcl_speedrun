@@ -29,10 +29,12 @@ minetest.register_on_leaveplayer(function(player)
     local name = player:get_player_name()
     local meta = player:get_meta()
     meta:set_int("mcl_speedrun:playtime", current[name].playtime)
+    --meta:set_int("mcl_speedrun:playtime", 100)
     meta:set_int("mcl_speedrun:playtime_nether", current[name].playtime_nether)
     meta:set_int("mcl_speedrun:playtime_end", current[name].playtime_end)
     meta:set("mcl_speedrun:is_nether", current[name].is_nether)
     meta:set("mcl_speedrun:is_end", current[name].is_end)
+    minetest.log("error", "val:"..meta:get_int("mcl_speedrun:playtime"))
     current[name] = nil
 end)
 
@@ -52,7 +54,7 @@ minetest.register_chatcommand("tt", {
     params = "",
     description = "Use it to get your own playtime!",
     func = function(name)
-        return true, mcl_speedrun.get_current_playtime(name)
+        return true, "Test: "..mcl_speedrun.get_current_playtime(name)
     end,
 })
 
