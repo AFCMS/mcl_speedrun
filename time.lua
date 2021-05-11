@@ -6,8 +6,8 @@ minetest.register_on_newplayer(function(player)
     meta:set_int("mcl_speedrun:playtime", 0)
     meta:set_int("mcl_speedrun:playtime_nether", 0)
     meta:set_int("mcl_speedrun:playtime_end", 0)
-    meta:set("mcl_speedrun:is_nether", "false")
-    meta:set("mcl_speedrun:is_end", "false")
+    meta:set_int("mcl_speedrun:is_nether", 0)
+    meta:set_int("mcl_speedrun:is_end", 0)
 end)
 
 minetest.register_on_joinplayer(function(player)
@@ -18,26 +18,38 @@ minetest.register_on_joinplayer(function(player)
         playtime = meta:get_int("mcl_speedrun:playtime"),
         playtime_nether = meta:get_int("mcl_speedrun:playtime_nether"),
         playtime_end = meta:get_int("mcl_speedrun:playtime_end"),
-        is_nether = meta:get("mcl_speedrun:is_nether"),
-        is_end = meta:get("mcl_speedrun:is_end"),
+        is_nether = meta:get_int("mcl_speedrun:is_nether"),
+        is_end = meta:get_int("mcl_speedrun:is_end"),
     }
     
     --os.time()
 end)
 
-minetest.register_on_leaveplayer(function(player)
+local function save_data(player)
     local name = player:get_player_name()
     local meta = player:get_meta()
     meta:set_int("mcl_speedrun:playtime", current[name].playtime)
     --meta:set_int("mcl_speedrun:playtime", 100)
     meta:set_int("mcl_speedrun:playtime_nether", current[name].playtime_nether)
     meta:set_int("mcl_speedrun:playtime_end", current[name].playtime_end)
-    meta:set("mcl_speedrun:is_nether", current[name].is_nether)
-    meta:set("mcl_speedrun:is_end", current[name].is_end)
+    meta:set_int("mcl_speedrun:is_nether", current[name].is_nether)
+    meta:set_int("mcl_speedrun:is_end", current[name].is_end)
     minetest.log("error", "val:"..meta:get_int("mcl_speedrun:playtime"))
     current[name] = nil
+end
+
+minetest.register_on_leaveplayer(function(player)
+    save_data(player)
 end)
 
+minetest.register_on_shutdown(function()
+	for name, _ in pairs(current) do
+		local player = minetest.get_player_by_name(name)
+		if player then
+			save_data(player)
+		end
+	end
+end)
 
 function mcl_speedrun.get_current_playtime(name)
     return current[name].playtime
