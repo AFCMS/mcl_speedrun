@@ -62,7 +62,7 @@ minetest.register_globalstep(function(dtime)
     end
 end)
 
-minetest.register_chatcommand("tt", {
+minetest.register_chatcommand("t", {
     params = "",
     description = "Use it to get your own playtime!",
     func = function(name)
