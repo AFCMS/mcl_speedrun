@@ -1,104 +1,178 @@
-local current = {}
+--https://youtu.be/MnQqXQTfhco?t=20
+
+local data = {points = {}}
 local huds = {}
 
-minetest.register_on_newplayer(function(player)
-    local meta = player:get_meta()
-    meta:set_int("mcl_speedrun:playtime", 0)
-    meta:set_int("mcl_speedrun:playtime_nether", 0)
-    meta:set_int("mcl_speedrun:playtime_end", 0)
-    meta:set_int("mcl_speedrun:is_nether", 0)
-    meta:set_int("mcl_speedrun:is_end", 0)
-end)
+local math = math
 
-minetest.register_on_joinplayer(function(player)
-    local name = player:get_player_name()
-    local meta = player:get_meta()
-    current[name] = {
-        start = os.time(),
-        playtime = meta:get_int("mcl_speedrun:playtime"),
-        playtime_nether = meta:get_int("mcl_speedrun:playtime_nether"),
-        playtime_end = meta:get_int("mcl_speedrun:playtime_end"),
-        is_nether = meta:get_int("mcl_speedrun:is_nether"),
-        is_end = meta:get_int("mcl_speedrun:is_end"),
-    }
-    
-    --os.time()
-end)
-
-local function save_data(player)
-    local name = player:get_player_name()
-    local meta = player:get_meta()
-    meta:set_int("mcl_speedrun:playtime", current[name].playtime)
-    --meta:set_int("mcl_speedrun:playtime", 100)
-    meta:set_int("mcl_speedrun:playtime_nether", current[name].playtime_nether)
-    meta:set_int("mcl_speedrun:playtime_end", current[name].playtime_end)
-    meta:set_int("mcl_speedrun:is_nether", current[name].is_nether)
-    meta:set_int("mcl_speedrun:is_end", current[name].is_end)
-    minetest.log("error", "val:"..meta:get_int("mcl_speedrun:playtime"))
-    current[name] = nil
+if not minetest.is_singleplayer() then
+	error("This mod can only be played in singleplayer")
 end
 
-minetest.register_on_leaveplayer(function(player)
-    save_data(player)
-end)
+mcl_speedrun.text_color = 0x52ca46
+mcl_speedrun.title = "Mineclone2:"
 
-minetest.register_on_shutdown(function()
-	for name, _ in pairs(current) do
-		local player = minetest.get_player_by_name(name)
-		if player then
-			save_data(player)
+function mcl_speedrun.checkpoint(player, checkpoint)
+    if data.points[checkpoint] then
+        data.points[checkpoint].checked = true
+        data.points[checkpoint].checked = data.elapsed
+        player:hud_change(huds[checkpoint].time, "text", mcl_speedrun.time_to_string(data.elapsed))
+        if mcl_speedrun.required[checkpoint] then
+            local tous = true
+            for name,_ in pairs(mcl_speedrun.required) do
+                if not data.points[name].checked then
+                    tous = false
+                    break
+                end
+            end
+			data.win = tous
+        end
+    else
+        minetest.log("error", "[mcl_speedrun] Trying to check invalid checkpoint")
+    end
+end
+
+function mcl_speedrun.has_checkpoint(player, checkpoint)
+    if data.points[checkpoint] then
+        if data.points[checkpoint].checked then
+			return true
 		end
+    else
+        minetest.log("error", "[mcl_speedrun] Trying to get invalid checkpoint")
+		return nil
+    end
+end
+
+function mcl_speedrun.time_to_string(time)
+	return string.format('%02d:%02d:%02d', math.floor(time / 3600), math.floor(time / 60 % 60), math.floor(time % 60))
+end
+
+--[[
+| description             |
+| checkpoint1: icon, time |
+| total time              |
+]]
+
+local function init_hud(player)
+    huds.desc_bg = player:hud_add({
+        hud_elem_type = "image",
+        position  = {x=0, y=0.05},
+        offset    = {x=5, y=10},
+        text      = "mcl_speedrun_text_bg.png",
+        scale     = { x = 2, y = 2},
+        alignment = { x = 1, y = 1 },
+        z_index = -100,
+    })
+    huds.desc = player:hud_add({
+        hud_elem_type = "text",  -- See HUD element types
+        position = {x=0, y=0.05},
+        -- Left corner position of element
+        name = "desc",
+        text = mcl_speedrun.title.." "..mcl_speedrun.description,
+        number = mcl_speedrun.text_color,
+        alignment = {x=1, y=1},
+        offset = {x=10, y=15},
+        size = { x=1 },
+        z_index = 100,
+    })
+    local count = 0
+    for _,def in pairs(mcl_speedrun.checkpoints) do
+        count = count + 1
+        huds[def.name] = {}
+        huds[def.name].bg = player:hud_add({
+            hud_elem_type = "image",
+            position  = {x=0, y=0.05},
+            offset    = {x=5, y=10+40*count},
+            text      = "mcl_speedrun_text_bg.png",
+            scale     = { x = 2, y = 2},
+            alignment = { x = 1, y = 1 },
+            z_index = -100,
+        })
+        huds[def.name].icon = player:hud_add({
+            hud_elem_type = "image",
+            position  = {x=0, y=0.05},
+            offset    = {x=10, y=12+40*count},
+            text      = def.icon,
+            scale     = { x = 2, y = 2},
+            alignment = { x = 1, y = 1 },
+            z_index = -100,
+        })
+        huds[def.name].desc = player:hud_add({
+            hud_elem_type = "text",
+            position = {x=0, y=0.05},
+            offset    = {x=10+32+4, y=15+40*count},
+            text = def.desc,
+            number = mcl_speedrun.text_color,
+            alignment = {x=1, y=1},
+            size = { x=1 },
+            z_index = 100,
+        })
+        huds[def.name].time = player:hud_add({
+            hud_elem_type = "text",
+            position = {x=0, y=0.05},
+            offset    = {x=10+32+4+150, y=15+40*count},
+            text = "--:--:--",
+            number = mcl_speedrun.text_color,
+            alignment = {x=1, y=1},
+            size = { x=1 },
+            z_index = 100,
+        })
+    end
+    count = count + 1
+    huds.base_bg = player:hud_add({
+        hud_elem_type = "image",
+        position  = {x=0, y=0.05},
+        offset = {x=5, y=10+40*count},
+        text      = "mcl_speedrun_text_bg.png",
+        scale     = { x = 2, y = 2.1},
+        alignment = { x = 1, y = 1 },
+        z_index = -100,
+    })
+    huds.base = player:hud_add({
+        hud_elem_type = "text",  -- See HUD element types
+        -- Type of element, can be "image", "text", "statbar", "inventory",
+        -- "compass" or "minimap"
+        position = {x=0, y=0.05},
+        name = "base",
+        text = mcl_speedrun.time_to_string(0),
+        number = mcl_speedrun.text_color,
+        alignment = {x=1, y=1},
+        offset = {x=10, y=4+40*count},
+        size = { x=3 },
+        z_index = 100,
+    })
+end
+
+minetest.register_on_joinplayer(function(player)
+	local playername = player:get_player_name()
+	local meta = player:get_meta()
+	--if meta:get_int("mcl_speedrun:has_speedruned") == 0 then
+    if true then
+		for _,def in pairs(mcl_speedrun.checkpoints) do
+			data.points[def.name] = {checked = false, time = nil}
+		end
+        data.points.START.checked = true
+        data.points.START.time = 0
+		data.elapsed = 0
+		data.win = false
+		--meta:set_int("mcl_speedrun:has_speedruned", 1)
+        init_hud(player)
+        player:hud_change(huds["START"].time, "text", mcl_speedrun.time_to_string(0))
 	end
 end)
 
-function mcl_speedrun.get_current_playtime(name)
-    return current[name].playtime
-end
+minetest.register_on_leaveplayer(function(player)
+    data[player:get_player_name()] = nil
+end)
 
 minetest.register_globalstep(function(dtime)
     for _,player in pairs(minetest.get_connected_players()) do
-        local name = player:get_player_name()
-        current[name].playtime = os.time() - current[name].start
+        --local playername = player:get_player_name()
+		if not data.win then
+			data.elapsed = data.elapsed + dtime
+        	player:hud_change(huds.base, "text", mcl_speedrun.time_to_string(data.elapsed))
+		elseif player:hud_get(huds.base).number ~= 0x6e6e6e then
+			player:hud_change(huds.base, "number", 0x6e6e6e)
+		end
     end
 end)
-
-minetest.register_chatcommand("t", {
-    params = "",
-    description = "Use it to get your own playtime!",
-    func = function(name)
-        return true, "Test: "..mcl_speedrun.get_current_playtime(name)
-    end,
-})
-
---[[Function to get playtime
-function playtime.get_total_playtime(name)
-  return storage:get_int(name) + playtime.get_current_playtime(name)
-end
-
-function playtime.remove_playtime(name)
-  storage:set_string(name, "")
-end
-
-minetest.register_on_leaveplayer(function(player)
-  local name = player:get_player_name()
-  storage:set_int(name, storage:get_int(name) + playtime.get_current_playtime(name))
-  current[name] = nil
-end)
-
-minetest.register_on_joinplayer(function(player)
-  local name = player:get_player_name()
-  current[name] = os.time()
-end)]]
-
-local function SecondsToClock(seconds)
-  local seconds = tonumber(seconds)
-
-  if seconds <= 0 then
-    return "00:00:00";
-  else
-    hours = string.format("%02.f", math.floor(seconds/3600));
-    mins = string.format("%02.f", math.floor(seconds/60 - (hours*60)));
-    secs = string.format("%02.f", math.floor(seconds - hours*3600 - mins *60));
-    return hours..":"..mins..":"..secs
-  end
-end

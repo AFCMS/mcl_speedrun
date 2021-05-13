@@ -1,2 +1,2 @@
-# mod_template
- <Mod description>
+# mcl_speedrun
+A speedrun mod for MineClone2
