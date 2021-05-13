@@ -28,7 +28,7 @@ if speedruntype == "dragon" then
     -- FIXME: be sure a better check apply (maybe mcl2 changes)
     minetest.register_globalstep(function(dtime)
         for _,player in pairs(minetest.get_connected_players()) do
-            if mcl_playerinfo[player:get_player_name()].node_feet == "mcl_portals:portal_end" then
+            if mcl_worlds.pos_to_dimension(player:get_pos()) == "end" and mcl_playerinfo[player:get_player_name()].node_feet == "mcl_portals:portal_end" then
                 mcl_speedrun.checkpoint(player, "dragon_kill")
             end
         end
