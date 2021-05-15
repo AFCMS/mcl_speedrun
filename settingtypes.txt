@@ -1,2 +1,2 @@
 #   Name of the speedrun
-mcl_speedrun.speedrun_type (Speedrun type) enum dragon dragon
+mcl_speedrun.speedrun_type (Speedrun type) enum dragon dragon,bosses

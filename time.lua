@@ -61,7 +61,7 @@ local function init_hud(player)
         text      = "mcl_speedrun_text_bg.png",
         scale     = { x = 2, y = 2},
         alignment = { x = 1, y = 1 },
-        z_index = -100,
+        z_index = 2000,
     })
     huds.desc = player:hud_add({
         hud_elem_type = "text",  -- See HUD element types
@@ -73,7 +73,7 @@ local function init_hud(player)
         alignment = {x=1, y=1},
         offset = {x=10, y=15},
         size = { x=1 },
-        z_index = 100,
+        z_index = 2010,
     })
     local count = 0
     for _,def in pairs(mcl_speedrun.checkpoints) do
@@ -86,7 +86,7 @@ local function init_hud(player)
             text      = "mcl_speedrun_text_bg.png",
             scale     = { x = 2, y = 2},
             alignment = { x = 1, y = 1 },
-            z_index = -100,
+            z_index = 2000,
         })
         huds[def.name].icon = player:hud_add({
             hud_elem_type = "image",
@@ -95,7 +95,7 @@ local function init_hud(player)
             text      = def.icon,
             scale     = { x = 2, y = 2},
             alignment = { x = 1, y = 1 },
-            z_index = -100,
+            z_index = 2010,
         })
         huds[def.name].desc = player:hud_add({
             hud_elem_type = "text",
@@ -105,7 +105,7 @@ local function init_hud(player)
             number = mcl_speedrun.text_color,
             alignment = {x=1, y=1},
             size = { x=1 },
-            z_index = 100,
+            z_index = 2010,
         })
         huds[def.name].time = player:hud_add({
             hud_elem_type = "text",
@@ -115,7 +115,7 @@ local function init_hud(player)
             number = mcl_speedrun.text_color,
             alignment = {x=1, y=1},
             size = { x=1 },
-            z_index = 100,
+            z_index = 2010,
         })
     end
     count = count + 1
@@ -126,7 +126,7 @@ local function init_hud(player)
         text      = "mcl_speedrun_text_bg.png",
         scale     = { x = 2, y = 2.1},
         alignment = { x = 1, y = 1 },
-        z_index = -100,
+        z_index = 2000,
     })
     huds.base = player:hud_add({
         hud_elem_type = "text",  -- See HUD element types
@@ -139,25 +139,30 @@ local function init_hud(player)
         alignment = {x=1, y=1},
         offset = {x=10, y=4+40*count},
         size = { x=3 },
-        z_index = 100,
+        z_index = 2010,
     })
 end
 
 minetest.register_on_joinplayer(function(player)
-	local playername = player:get_player_name()
-	local meta = player:get_meta()
+	--local playername = player:get_player_name()
+	--local meta = player:get_meta()
 	--if meta:get_int("mcl_speedrun:has_speedruned") == 0 then
     if true then
 		for _,def in pairs(mcl_speedrun.checkpoints) do
 			data.points[def.name] = {checked = false, time = nil}
 		end
-        data.points.START.checked = true
-        data.points.START.time = 0
 		data.elapsed = 0
 		data.win = false
 		--meta:set_int("mcl_speedrun:has_speedruned", 1)
         init_hud(player)
-        player:hud_change(huds["START"].time, "text", mcl_speedrun.time_to_string(0))
+        for _,def in pairs(mcl_speedrun.checkpoints) do
+			if def.name == "START" then
+                data.points.START.checked = true
+                data.points.START.time = 0
+                player:hud_change(huds["START"].time, "text", mcl_speedrun.time_to_string(0))
+                break
+            end
+		end
 	end
 end)
 
@@ -170,7 +175,7 @@ minetest.register_globalstep(function(dtime)
         --local playername = player:get_player_name()
 		if not data.win then
 			data.elapsed = data.elapsed + dtime
-        	player:hud_change(huds.base, "text", mcl_speedrun.time_to_string(data.elapsed))
+            player:hud_change(huds.base, "text", mcl_speedrun.time_to_string(data.elapsed))
 		elseif player:hud_get(huds.base).number ~= 0x6e6e6e then
 			player:hud_change(huds.base, "number", 0x6e6e6e)
 		end
