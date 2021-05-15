@@ -1,7 +1,7 @@
 local speedruntype = minetest.settings:get("mcl_speedrun.speedrun_type") or "dragon"
 
 if speedruntype == "dragon" then
-    mcl_speedrun.description = "Kill the dragon"
+    mcl_speedrun.description = "Any% Glitchless "
     mcl_speedrun.checkpoints = {
         {name = "START", desc = "Overworld", icon = "default_dirt.png^default_dry_grass_side.png"},
         {name = "nether_enter", desc = "Enter the Nether", icon = "mcl_nether_netherrack.png"},
@@ -19,19 +19,6 @@ if speedruntype == "dragon" then
             mcl_speedrun.checkpoint(player, "end_enter")
         end
     end)
-    --[[mcl_worlds.register_on_dimension_change(function(player, dimension, last_dimension)
-        if last_dimension == "end" and dimension == "overworld" then
-            mcl_speedrun.checkpoint(player, "dragon_kill")
-        end
-    end)]]
-
-    --[[minetest.register_globalstep(function(dtime)
-        for _,player in pairs(minetest.get_connected_players()) do
-            if mcl_worlds.pos_to_dimension(player:get_pos()) == "end" and mcl_playerinfo[player:get_player_name()].node_feet == "mcl_portals:portal_end" then
-                mcl_speedrun.checkpoint(player, "dragon_kill")
-            end
-        end
-    end)]]
     local old_end_teleport = mcl_portals.end_teleport
     function mcl_portals.end_teleport(obj, pos)
         if mcl_worlds.pos_to_dimension(pos) == "end" then
@@ -40,7 +27,7 @@ if speedruntype == "dragon" then
         return old_end_teleport(obj, pos)
     end
 elseif speedruntype == "bosses" then
-    mcl_speedrun.description = "Kill every Bosses"
+    mcl_speedrun.description = "Kill Bosses"
     mcl_speedrun.checkpoints = {
         {name = "guardian_kill", desc = "Kill the Guardian", icon = "mcl_ocean_prismarine_bricks.png"},
         {name = "wither_kill", desc = "Kill the Wither", icon = "mcl_nether_soul_sand.png"},
