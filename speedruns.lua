@@ -47,4 +47,22 @@ elseif speedruntype == "bosses" then
             end
         end
     end)
+elseif speedruntype == "all-achievements" then
+    mcl_speedrun.description =  "All Achievements"
+    mcl_speedrun.checkpoints = {}
+    mcl_speedrun.required = {}
+    for name, def in pairs(awards.def) do
+        table.insert(mcl_speedrun.checkpoints, {name=name, desc=def.title, icon=def.icon})
+        mcl_speedrun.required[name] = true
+    end
+    -- HACK!!!!
+    -- Needs mcl2 awards API changes (on the TODO list)
+    awards.register_on_unlock(function(playername, awdef)
+        for name, def in pairs(awards.def) do
+            if def.title == awdef.title then
+                mcl_speedrun.checkpoint(minetest.get_player_by_name(playername), name)
+                break
+            end
+        end
+    end)
 end
