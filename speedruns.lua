@@ -1,6 +1,6 @@
 local speedruntype = minetest.settings:get("mcl_speedrun.speedrun_type") or "dragon"
 
-if speedruntype == "dragon" then
+if speedruntype == "any-glitchless" then
     mcl_speedrun.description = "Any% Glitchless "
     mcl_speedrun.checkpoints = {
         {name = "START", desc = "Overworld", icon = "default_dirt.png^default_dry_grass_side.png"},

@@ -1,2 +1,2 @@
 #   Name of the speedrun
-mcl_speedrun.speedrun_type (Speedrun type) enum dragon dragon,bosses,all-achievements
+mcl_speedrun.speedrun_type (Speedrun type) enum any-glitchless any-glitchless,bosses,all-achievements
