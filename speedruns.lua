@@ -1,7 +1,7 @@
 local speedruntype = minetest.settings:get("mcl_speedrun.speedrun_type") or "dragon"
 
 if speedruntype == "any-glitchless" then
-    mcl_speedrun.description = "Any% Glitchless "
+    mcl_speedrun.description = "Any% Glitchless"
     mcl_speedrun.checkpoints = {
         {name = "START", desc = "Overworld", icon = "default_dirt.png^default_dry_grass_side.png"},
         {name = "nether_enter", desc = "Enter the Nether", icon = "mcl_nether_netherrack.png"},
@@ -26,7 +26,18 @@ if speedruntype == "any-glitchless" then
         end
         return old_end_teleport(obj, pos)
     end
-elseif speedruntype == "bosses" then
+elseif speedruntype == "enter-nether" then
+	mcl_speedrun.description = "Enter Nether"
+	mcl_speedrun.checkpoints = {
+		{name = "nether_enter", desc = "Enter the Nether", icon = "mcl_nether_netherrack.png"},
+	}
+	mcl_speedrun.required = {["nether_enter"] = true}
+	mcl_worlds.register_on_dimension_change(function(player, dimension, last_dimension)
+		if last_dimension == "overworld" and dimension == "nether" then
+			mcl_speedrun.checkpoint(player, "nether_enter")
+		end
+	end)
+elseif speedruntype == "kill-bosses" then
     mcl_speedrun.description = "Kill Bosses"
     mcl_speedrun.checkpoints = {
         {name = "guardian_kill", desc = "Kill the Guardian", icon = "mcl_ocean_prismarine_bricks.png"},
