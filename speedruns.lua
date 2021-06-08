@@ -1,8 +1,7 @@
 local speedruntype = minetest.settings:get("mcl_speedrun.speedrun_type") or "dragon"
 
-mcl_speedrun.description = speedruntype
-
-if speedruntype == "Any% Glitchless" then
+if speedruntype == "dragon" then
+    mcl_speedrun.description = "Any% Glitchless "
     mcl_speedrun.checkpoints = {
         {name = "START", desc = "Overworld", icon = "default_dirt.png^default_dry_grass_side.png"},
         {name = "nether_enter", desc = "Enter the Nether", icon = "mcl_nether_netherrack.png"},
@@ -27,7 +26,8 @@ if speedruntype == "Any% Glitchless" then
         end
         return old_end_teleport(obj, pos)
     end
-elseif speedruntype == "Kill Bosses" then
+elseif speedruntype == "bosses" then
+    mcl_speedrun.description = "Kill Bosses"
     mcl_speedrun.checkpoints = {
         {name = "guardian_kill", desc = "Kill the Guardian", icon = "mcl_ocean_prismarine_bricks.png"},
         {name = "wither_kill", desc = "Kill the Wither", icon = "mcl_nether_soul_sand.png"},
@@ -47,7 +47,8 @@ elseif speedruntype == "Kill Bosses" then
             end
         end
     end)
-elseif speedruntype == "All Achievements" then
+elseif speedruntype == "all-achievements" then
+    mcl_speedrun.description =  "All Achievements"
     mcl_speedrun.checkpoints = {}
     mcl_speedrun.required = {}
     for name, def in pairs(awards.def) do
