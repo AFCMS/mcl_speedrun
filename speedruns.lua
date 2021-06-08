@@ -65,4 +65,6 @@ elseif speedruntype == "all-achievements" then
             end
         end
     end)
+else
+	error("[mcl_speedrun] Speedrun Type is invalid!")
 end
