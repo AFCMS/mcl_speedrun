@@ -1,4 +1,4 @@
-local speedruntype = minetest.settings:get("mcl_speedrun.speedrun_type") or "dragon"
+local speedruntype = minetest.settings:get("mcl_speedrun.speedrun_type") or "any-glitchless"
 
 if speedruntype == "any-glitchless" then
     mcl_speedrun.description = "Any% Glitchless"
